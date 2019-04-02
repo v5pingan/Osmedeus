@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -i
 
 #global stuff
 CWD=$(pwd)
@@ -55,6 +55,7 @@ then
 	echo 'PATH=$GOPATH/bin:$PATH' >> $DEFAULT_SHELL
 	source $DEFAULT_SHELL
 fi
+PS="$ "
 source $DEFAULT_SHELL
 
 ##
@@ -95,7 +96,6 @@ cd $PLUGINS_PATH
 git clone https://github.com/blechschmidt/massdns
 cd massdns
 make
-
 
 
 ##
