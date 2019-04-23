@@ -10,6 +10,9 @@ class ScreenShot(object):
         utils.make_directory(options['WORKSPACE'] + '/screenshot')
         self.module_name = self.__class__.__name__
         self.options = options
+        if utils.resume(self.options, self.module_name):
+            utils.print_info("Detect is already done. use '-f' options to force rerun the module")
+            return
         slack.slack_noti('status', self.options, mess={
             'title':  "{0} | {1}".format(self.options['TARGET'], self.module_name),
             'content': 'Start ScreenShot for {0}'.format(self.options['TARGET'])
@@ -23,24 +26,24 @@ class ScreenShot(object):
 
     def initial(self):
         self.run()
-        utils.just_waiting(self.module_name, seconds=10)
+        utils.just_waiting(self.options, self.module_name, seconds=10)
         #this gonna run after module is done to update the main json
         # self.conclude()
 
     def run(self):
-        commands = execute.get_commands(self.module_name).get('routines')
+        commands = execute.get_commands(self.options, self.module_name).get('routines')
 
         for item in commands:
             utils.print_good('Starting {0}'.format(item.get('banner')))
             #really execute it
-            execute.send_cmd(item.get('cmd'), item.get(
+            execute.send_cmd(self.options, item.get('cmd'), item.get(
                 'output_path'), item.get('std_path'), self.module_name)
             time.sleep(1)
 
-        utils.just_waiting(self.module_name, seconds=30)
+        utils.just_waiting(self.options, self.module_name, seconds=30)
         #just save commands
         logfile = utils.replace_argument(self.options, '$WORKSPACE/log.json')
-        utils.save_all_cmd(logfile)
+        utils.save_all_cmd(self.options, logfile)
     
 
     # #update the main json file

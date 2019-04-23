@@ -10,6 +10,9 @@ class TakeOverScanning(object):
         utils.print_banner("Scanning for Subdomain TakeOver")
         self.module_name = self.__class__.__name__
         self.options = options
+        if utils.resume(self.options, self.module_name):
+            utils.print_info("Detect is already done. use '-f' options to force rerun the module")
+            return
         slack.slack_noti('status', self.options, mess={
             'title':  "{0} | {1}".format(self.options['TARGET'], self.module_name),
             'content': 'Start Scanning TakeOver for {0}'.format(self.options['TARGET'])
@@ -30,17 +33,17 @@ class TakeOverScanning(object):
             self.dig_info()
 
     def run(self):
-        commands = execute.get_commands(self.module_name).get('routines')
+        commands = execute.get_commands(self.options, self.module_name).get('routines')
         for item in commands:
             utils.print_good('Starting {0}'.format(item.get('banner')))
             #really execute it
-            execute.send_cmd(item.get('cmd'), item.get(
+            execute.send_cmd(self.options, item.get('cmd'), item.get(
                 'output_path'), item.get('std_path'), self.module_name)
 
-        utils.just_waiting(self.module_name, seconds=10)
+        utils.just_waiting(self.options, self.module_name, seconds=20, times=5)
         #just save commands
         logfile = utils.replace_argument(self.options, '$WORKSPACE/log.json')
-        utils.save_all_cmd(logfile)
+        utils.save_all_cmd(self.options, logfile)
 
     def dig_info(self):
         utils.print_good('Starting basic Dig')
@@ -60,7 +63,7 @@ class TakeOverScanning(object):
                     self.options, 'dig all {0} | tee $WORKSPACE/screenshot/digs/{0}.txt'.format(domain))
                 
                 output_path =  utils.replace_argument(self.options, 'tee $WORKSPACE/screenshot/digs/{0}.txt'.format(domain))
-                execute.send_cmd(cmd, '', '', self.module_name, True)
+                execute.send_cmd(self.options, cmd, '', '', self.module_name, True)
                 # time.sleep(0.5)
 
                 custom_logs['content'].append(
@@ -71,7 +74,7 @@ class TakeOverScanning(object):
         print(custom_logs)
         #submit a log
         utils.print_info('Update activities log')
-        utils.update_activities(str(custom_logs))
+        utils.update_activities(self.options, str(custom_logs))
             
 
 

@@ -18,9 +18,10 @@ class Conclusion(object):
 
     def save_log(self):
         logfile = utils.replace_argument(self.options, '$WORKSPACE/log.json')
-        utils.save_all_cmd(logfile)
-
-        utils.just_shutdown_flask()
+        utils.save_all_cmd(self.options, logfile)
+        
+        if self.options.get('CLIENT'):
+            utils.just_shutdown_flask(self.options)
 
 
 

@@ -11,7 +11,10 @@ class SubdomainScanning(object):
         utils.make_directory(options['WORKSPACE'] + '/subdomain')
         self.module_name = self.__class__.__name__
         self.options = options
-
+        if utils.resume(self.options, self.module_name):
+            utils.print_info(
+                "Detect is already done. use '-f' options to force rerun the module")
+            return
         slack.slack_noti('status', self.options, mess={
             'title':  "{0} | {1}".format(self.options['TARGET'], self.module_name),
             'content': 'Start Scanning Subdomain for {0}'.format(self.options['TARGET'])
@@ -19,7 +22,7 @@ class SubdomainScanning(object):
 
         self.initial()
 
-        utils.just_waiting(self.module_name, seconds=10)
+        utils.just_waiting(self.options, self.module_name, seconds=10)
         self.conclude()
 
         #this gonna run after module is done to update the main json
@@ -34,18 +37,19 @@ class SubdomainScanning(object):
 
 
     def run(self):
-        commands = execute.get_commands(self.module_name).get('routines')
+        commands = execute.get_commands(self.options, self.module_name).get('routines')
         if self.options['DEBUG'] == "True":
-            commands = commands[1:]
+            commands = [commands[1]]
 
         for item in commands:
             utils.print_good('Starting {0}'.format(item.get('banner')))
             #really execute it
-            execute.send_cmd(item.get('cmd'), item.get(
+            execute.send_cmd(self.options, item.get('cmd'), item.get(
                 'output_path'), item.get('std_path'), self.module_name)
             time.sleep(1)
 
-        utils.just_waiting(self.module_name, seconds=30)
+        utils.just_waiting(self.options, self.module_name, seconds=5)
+        # utils.just_waiting(self.options, self.module_name, seconds=30)
 
     #just clean up some output
     def unique_result(self):
@@ -86,7 +90,7 @@ class SubdomainScanning(object):
 
         output_path = utils.replace_argument(self.options,
                                '$WORKSPACE/subdomain/final-$OUTPUT.txt')
-        utils.just_write(output_path, "\n".join(set(domains)))
+        utils.just_write(output_path, "\n".join(set([x.strip() for x in domains])))
 
         time.sleep(1)
         slack.slack_file('report', self.options, mess={
@@ -110,8 +114,8 @@ class SubdomainScanning(object):
             main_json['Subdomains'].append({
                 "Domain": subdomain,
                 "IP": "N/A",
-                "Technology": [],
-                "Ports": [],
+                "Technology": ["N/A"],
+                "Ports": ["N/A"],
             })
 
         utils.just_write(utils.replace_argument(

@@ -1,9 +1,10 @@
 import os, socket, time
-import shutil
+import shutil, string, random
 
 from core import utils
 from pprint import pprint
 from configparser import ConfigParser, ExtendedInterpolation
+import string
 
 # Console colors
 W = '\033[1;0m'   # white
@@ -17,7 +18,7 @@ C = '\033[1;36m'  # cyan
 GR = '\033[1;37m'  # gray
 
 __author__ = '@j3ssiejjj'
-__version__ = '1.1'
+__version__ = '1.2'
 
 def banner():
     print(r"""{1}
@@ -51,17 +52,21 @@ def parsing_config(config_path, args):
     options = {}
 
     ##some default path
-    go_path = str(os.getenv("GOPATH")) + "/bin"
     github_api_key = str(os.getenv("GITROB_ACCESS_TOKEN"))
     cwd = str(os.getcwd())
+
+    #just hardcode if gopath not loaded
+    go_path = cwd + "/plugins/go"
+    # go_path = str(os.getenv("GOPATH")) + "/bin"
+    # if "None" in go_path:
+    #     go_path = cwd + "/plugins/go"
+
     bot_token = str(os.getenv("SLACK_BOT_TOKEN"))
     log_channel = str(os.getenv("LOG_CHANNEL"))
     status_channel = str(os.getenv("STATUS_CHANNEL"))
     report_channel = str(os.getenv("REPORT_CHANNEL"))
     stds_channel = str(os.getenv("STDS_CHANNEL"))
     verbose_report_channel = str(os.getenv("VERBOSE_REPORT_CHANNEL"))
-
-
 
 
     if os.path.isfile(config_path):
@@ -105,21 +110,20 @@ def parsing_config(config_path, args):
 
     module = str(args.module)
     debug = str(args.debug)
+    force = str(args.force)
 
     config.set('Mode', 'speed', speed)
     config.set('Mode', 'module', module)
     config.set('Mode', 'debug', debug)
+    config.set('Mode', 'force', force)
 
     ##target stuff
     #parsing agument
-
-
     git_target = args.git if args.git else None
     burpstate_target = args.burp if args.burp else None
     target_list = args.targetlist if args.targetlist else None
     company = args.company if args.company else None
-
-
+    direct_input = args.input if args.input else None
 
     if args.target:
         target = args.target
@@ -138,13 +142,16 @@ def parsing_config(config_path, args):
         else:
             workspace += strip_target
 
-        try:
-            ip = socket.gethostbyname(strip_target)
-        except:
-            ip = "None"
-            utils.print_bad("Something wrong to connect to {0}".format(target))
+        if not direct_input:
+            try:
+                ip = socket.gethostbyname(strip_target)
+            except:
+                ip = "None"
+                utils.print_bad("Something wrong to connect to {0}".format(target))
+        else:
+            ip = None
 
-
+    config.set('Target', 'input', str(direct_input))
     config.set('Target', 'git_target', str(git_target))
     config.set('Target', 'burpstate_target', str(burpstate_target))
     config.set('Target', 'target_list', str(target_list))
@@ -156,10 +163,14 @@ def parsing_config(config_path, args):
     config.set('Enviroments', 'workspace', str(workspace))
 
 
-        #create workspace folder for the target
+    #create workspace folder for the target
     utils.make_directory(workspace)
 
-
+    #set random password if default password detect
+    if config['Server']['password'] == 'super_secret':
+        new_pass = ''.join(random.choice(string.ascii_lowercase)
+                           for i in range(6)).upper()
+        config.set('Server', 'password', new_pass)
 
 
     #save the config

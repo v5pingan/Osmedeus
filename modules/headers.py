@@ -13,6 +13,9 @@ class HeadersScan(object):
         utils.make_directory(options['WORKSPACE'] + '/headers/details')
         self.module_name = self.__class__.__name__
         self.options = options
+        if utils.resume(self.options, self.module_name):
+            utils.print_info("Detect is already done. use '-f' options to force rerun the module")
+            return
         slack.slack_noti('status', self.options, mess={
             'title':  "{0} | {1}".format(self.options['TARGET'], self.module_name),
             'content': 'Start Headers Scanning for {0}'.format(self.options['TARGET'])
@@ -26,7 +29,7 @@ class HeadersScan(object):
 
     def initial(self):
         if self.observatory():
-            utils.just_waiting(self.module_name)
+            utils.just_waiting(self.options, self.module_name)
             try:
                 self.conclude()
             except:
@@ -53,7 +56,7 @@ class HeadersScan(object):
                 cmd = 'observatory -q {0} --format=json -z --attempts 10 | tee $WORKSPACE/headers/details/{0}-observatory.json'.format(
                     domain.strip())
                 cmd = utils.replace_argument(self.options, cmd)
-                execute.send_cmd(cmd, '', '', self.module_name)
+                execute.send_cmd(self.options, cmd, '', '', self.module_name)
 
             while not utils.checking_done(module=self.module_name):
                 time.sleep(15)
