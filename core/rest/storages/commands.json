@@ -14,7 +14,7 @@
         "quick": [
             {
                 "banner": "Amass",
-                "cmd": "$GO_PATH/amass -active -max-dns-queries 50000 -dir $WORKSPACE/subdomain/amass-$OUTPUT -d $TARGET -o $WORKSPACE/subdomain/$OUTPUT-amass.txt",
+                "cmd": "$GO_PATH/amass enum -active -max-dns-queries 30000 -dir $WORKSPACE/subdomain/amass-$OUTPUT -d $TARGET -o $WORKSPACE/subdomain/$OUTPUT-amass.txt",
                 "output_path": "$WORKSPACE/subdomain/$OUTPUT-amass.txt",
                 "std_path": "$WORKSPACE/subdomain/std-$TARGET-amass.std"
             },
@@ -32,6 +32,18 @@
             }
         ],
         "slow": [
+            {
+                "banner": "Amass",
+                "cmd": "$GO_PATH/amass enum -active -max-dns-queries 50000 -dir $WORKSPACE/subdomain/amass-$OUTPUT -d $TARGET -o $WORKSPACE/subdomain/$OUTPUT-amass.txt",
+                "output_path": "$WORKSPACE/subdomain/$OUTPUT-amass.txt",
+                "std_path": "$WORKSPACE/subdomain/std-$TARGET-amass.std"
+            },
+            {
+                "banner": "Subfinder",
+                "cmd": "$GO_PATH/subfinder -d $TARGET -t 100 -o $WORKSPACE/subdomain/$OUTPUT-subfinder.txt -nW",
+                "output_path": "$WORKSPACE/subdomain/$OUTPUT-subfinder.txt",
+                "std_path": "$WORKSPACE/subdomain/std-$OUTPUT-subfinder.std"
+            },
             {
                 "banner": "gobuster",
                 "cmd": "$PLUGINS_PATH/massdns/scripts/subbrute.py $DOMAIN_FULL $TARGET | $PLUGINS_PATH/massdns/bin/massdns -r $PLUGINS_PATH/massdns/lists/resolvers.txt -q -t A -o Sm -w $WORKSPACE/subdomain/raw-massdns.txt",
@@ -137,24 +149,47 @@
         ]
     },
     "PortScan": {
-        "report": "$WORKSPACE/portscan/final-$OUTPUT.html",
+        "report": [
+            {
+                "path" : "$WORKSPACE/portscan/final-$OUTPUT.html",
+                "type" : "html"
+            },
+            {
+                "path" : "$WORKSPACE/portscan/$OUTPUT-masscan-screenshots.html",
+                "type" : "html"
+            },
+            {
+                "path" : "$WORKSPACE/portscan/$OUTPUT-masscan-summary.txt",
+                "type" : "bash"
+            }
+        ],
         "quick": [
             {
-                "banner": "Custom"
+                "banner": "PortScan"
             }
         ]
     },
     "DirBrute": {
+        "report": [
+            {
+                "path": "$WORKSPACE/directory/$OUTPUT-summary.txt",
+                "type": "bash"
+            },
+            {
+                "path": "$WORKSPACE/directory/$OUTPUT-screenshots/aquatone_report.html",
+                "type": "html"
+            }
+        ],
         "quick": [
             {
-                "banner": "Custom"
+                "banner": "DirBrute"
             }
         ]
     },
     "VulnScan": {
         "quick": [
             {
-                "banner": "Custom"
+                "banner": "VulnScan"
             }
         ]
     },
@@ -190,7 +225,7 @@
                 "std_path": "$WORKSPACE/gitscan/std-$TARGET-trufflehog.std"
             },
             {
-                "banner": "trufflehog",
+                "banner": "gitrob",
                 "cmd": "$GO_PATH/gitrob -save $WORKSPACE/gitscan/$TARGET-gitrob -threads 10 -github-access-token $GITHUB_API_KEY $INPUT",
                 "output_path": "$WORKSPACE/gitscan/$TARGET-gitrob.txt",
                 "std_path": "$WORKSPACE/gitscan/std-$TARGET-gitrob.std"

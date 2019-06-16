@@ -3,9 +3,9 @@
   <p align="center">
     <a href="https://github.com/j3ssie/Osmedeus"><img alt="python" src="https://img.shields.io/badge/python-3.6%2B-blue.svg"></a>
     <a href=""><img alt="Software License" src="https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square"></a>
-    <a href=""><img alt="OS" src="https://img.shields.io/badge/OS-Linux,%20macOS-green.svg"></a>
-    <a href="https://github.com/j3ssie/Osmedeus"><img alt="Release" src="https://img.shields.io/badge/version-1.2-red.svg"></a>
-    <a href="https://youtu.be/8L5BAyyrNc0"><img alt="Demo" src="https://img.shields.io/badge/demo-youtube-blue.svg"></a>
+    <a href=""><img alt="tested" src="https://img.shields.io/badge/tested-Kali%20Linux-green.svg"></a>
+    <a href="https://github.com/j3ssie/Osmedeus"><img alt="Release" src="https://img.shields.io/badge/version-1.4-red.svg"></a>
+    <a href="https://youtu.be/qWb78SYWLn4"><img alt="Demo" src="https://img.shields.io/badge/demo-youtube-blue.svg"></a>
   </p>
 </p>
 
@@ -30,6 +30,8 @@ cd Osmedeus
 ```
 This install only focus on Kali linux, check more install on [Wiki page](https://github.com/j3ssie/Osmedeus/wiki)
 
+# Using Docker 
+Check out [docker-osmedeus](https://github.com/mablanco/docker-osmedeus) by [mabnavarrete](https://twitter.com/mabnavarrete) for docker installation and this [wiki](https://github.com/j3ssie/Osmedeus/wiki/Using-Docker) for more detail.
 
 # Features
 - [x] Subdomain Scan.
@@ -45,9 +47,58 @@ This install only focus on Kali linux, check more install on [Wiki page](https:/
 - [x] Vulnerable Scan.
 - [x] Seperate workspaces to store all scan output and details logging.
 - [x] REST API.
-- [x] React Web UI.
+- [x] React [Web UI](https://github.com/j3ssie/Osmedeus/wiki/Web-UI).
 - [x] Support Continuous Scan.
 - [x] Slack notifications.
+
+# More options
+
+```
+Basic Usage
+===========
+python3 osmedeus.py -t <your_target>
+python3 osmedeus.py -T <list_of_targets>
+
+Advanced Usage
+==============
+[*] List all module
+python3 osmedeus.py -M
+
+[*] Running with specific module
+python3 osmedeus.py -t <result_folder> -m <module_name> -i <your_target>
+python3 osmedeus.py [-t <result_folder>] -m <module_name> -I <tagets_list_file>
+
+[*] Example command
+python3 osmedeus.py -m portscan -i "1.2.3.4/24"
+python3 osmedeus.py -t sample2 -m vuln -i "1.2.3.4/24"
+python3 osmedeus.py -t sample2 -m dirb -I /tmp/list_of_hosts.txt
+
+Remote Options
+==============
+--remote REMOTE       Remote address for API, (default: https://127.0.0.1:5000)
+--auth AUTH           Specify auth tication e.g: --auth="username:password"
+                      See your config file for more detail (default: core/config.conf)
+
+--client              just run client stuff in case you ran the flask server before
+
+More options
+==============
+--update              Update lastest from git
+
+-c CONFIG, --config CONFIG
+                      Specify config file (default: core/config.conf)
+
+-w WORKSPACE, --workspace WORKSPACE
+                      Custom workspace folder
+
+-f, --force           force to run the module again if output exists
+-v, --verbose         show verbose output
+-q, --quick           run this tool with quick routine
+-s, --slow            run this tool with slow routine
+
+--debug               Just for debug purpose
+
+```
 
 # Demo
 [![asciicast](https://asciinema.org/a/230164.svg)](https://asciinema.org/a/230164)
@@ -65,15 +116,19 @@ This install only focus on Kali linux, check more install on [Wiki page](https:/
 
 # Disclaimer
 Most of this tool done by the authors of the tool that list in [CREDITS.md](https://github.com/j3ssie/Osmedeus/blob/master/CREDITS.md).
-I'm just put all the pieces together, plus some extra boring stuff that we don't wanna do everyday.
+I'm just put all the pieces together, plus some extra magic.
 
 This tool is for educational purposes only. You are responsible for your own actions. If you mess something up or break any laws while using this software, it's your fault, and your fault only.
 
 # Contribute
 Please take a look at [CONTRIBUTING.md](https://github.com/j3ssie/Osmedeus/blob/master/CONTRIBUTING.md)
 
+# Changelog
+Please take a look at [CHANGELOG.md](https://github.com/j3ssie/Osmedeus/blob/master/CHANGELOG.md)
+
 # CREDITS
 Please take a look at [CREDITS.md](https://github.com/j3ssie/Osmedeus/blob/master/CREDITS.md)
+
 
 # Contact
 [@j3ssiejjj](https://twitter.com/j3ssiejjj)
